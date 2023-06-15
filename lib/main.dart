@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-void main() => runApp(const YoutubeApp());
+void main() async {
+  await dotenv.load(fileName: ".env");
+  return runApp(const YoutubeApp());
+}
 
 class YoutubeApp extends StatelessWidget {
   const YoutubeApp({super.key});
@@ -28,7 +32,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final String apiKey = 'AIzaSyArl3jl57MpY_dY_Own5n9tCL8CfpDTM_g';
   // final String channelId = 'YOUR_YOUTUBE_CHANNEL_ID';
   List<dynamic> videoList = [];
 
@@ -39,6 +42,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void fetchVideos() async {
+    final apiKey = dotenv.env['apiKey'] ?? "";
     var response = await http.get(Uri.parse(
         'https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&order=date&type=video&key=$apiKey'));
     // 'https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=$channelId&maxResults=10&order=date&type=video&key=$apiKey'));
@@ -78,8 +82,8 @@ class _HomePageState extends State<HomePage> {
                   Image.network(video['thumbnails']['high']['url']),
                   ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: NetworkImage(
-                          video['thumbnails']['high']['url']),
+                      backgroundImage:
+                          NetworkImage(video['thumbnails']['high']['url']),
                     ),
                     title: Text(video['title']),
                     subtitle: Text(video['channelTitle']),
